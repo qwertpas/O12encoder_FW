@@ -1,0 +1,12 @@
+../Core/Inc/utils.h:18:9:clip	3
+../Core/Inc/utils.h:22:9:min3	4
+../Core/Inc/utils.h:26:9:max3	4
+../Core/Inc/utils.h:30:9:abs16	1
+../Core/Inc/utils.h:34:9:abs32	1
+../Core/Inc/utils.h:39:9:pad14	2
+../Core/Src/main.c:242:6:SystemClock_Config	4
+../Core/Src/main.c:88:5:main	14
+../Core/Src/main.c:421:6:HAL_UARTEx_RxEventCallback	1
+../Core/Src/main.c:425:6:HAL_UART_TxCpltCallback	1
+../Core/Src/main.c:430:6:HAL_UART_ErrorCallback	2
+../Core/Src/main.c:447:6:Error_Handler	1
