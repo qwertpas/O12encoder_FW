@@ -35,13 +35,15 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define UART_ADDR 0x2
+#define UART_ADDR 0x1
 
-// #define MA702 //addr 0x1
-#define MA730 //addr 0x2 is MA730
+// #define MA702 //12 bit
+#define MA730 //14 bit, both encoders on squirrel rear leg are MA730
 
 #define UART_TX_SIZE 10
 #define UART_RX_SIZE 3
+
+#define ANGLE_FILT_LVL 8
 
 /* USER CODE END PD */
 
@@ -120,6 +122,9 @@ int main(void) {
     static uint16_t m_angle_prev;
     static int32_t revs = 0;
     static int32_t cont_angle = 0;
+    static int64_t cont_angle_accum = 0;
+
+    static uint8_t m_angle_inited = 0;
 
     static int16_t encoder_res = 7;
 
@@ -159,12 +164,24 @@ int main(void) {
         m_angle = (((uint16_t)(spi_RX[0]) << 8) + spi_RX[1]) >> 1; //14 bit encoder
         #endif
 
-        if (m_angle_prev < 8192 && m_angle > 24576) { // detect angle wraparound and increment a revolution
-            revs -= 32768;
-        } else if (m_angle < 8192 && m_angle_prev > 24576) {
-            revs += 32768;
+        if(!m_angle_inited){
+        	m_angle_inited = 1;
+        }else{ //angle wraparound
+			if (m_angle_prev < 8192 && m_angle > 24576) { // detect angle wraparound and increment a revolution
+				revs -= 32768;
+			} else if (m_angle < 8192 && m_angle_prev > 24576) {
+				revs += 32768;
+			}
         }
-        cont_angle = m_angle + revs;
+//        cont_angle = m_angle + revs;
+
+        cont_angle = cont_angle_accum >> ANGLE_FILT_LVL;
+        cont_angle_accum = cont_angle_accum - cont_angle + (m_angle + revs);
+
+		//rpm = rpm_accum >> RPM_FILT_LVL;
+//	    rpm_accum = rpm_accum - rpm + rpm_raw;
+
+
         m_angle_prev = m_angle;
 
 
